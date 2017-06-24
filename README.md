@@ -3,7 +3,7 @@
 
 ## What is it?
 
-The TRT Project is a project where I remaster plugins which are broken or just need a revival, Sometimes i'll make paid versions of plugins and sometimes I wont, You can download all my free plugins from here.
+The TRT Project is a project where I either remaster plugins which are broken or I post my own-crafted work, Sometimes i'll make paid versions of plugins and sometimes I wont, You can download all my free plugins from here.
 
 ## Built With
 
