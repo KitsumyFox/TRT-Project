@@ -1,6 +1,5 @@
 # The Roaring Tiger Project
-
-For the record, I am BloodTiger.
+* [Steam Group](http://steamcommunity.com/groups/TRTProject)
 
 ## Getting Started
 
