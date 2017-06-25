@@ -15,6 +15,7 @@ That's great, just add me on [Steam](http://steamcommunity.com/profiles/76561198
 ## Authors
 
 * **BloodTiger** - *All Plugins*
+*Credit goes to all authors of the plugins i've edited*
 
 ## License
 
