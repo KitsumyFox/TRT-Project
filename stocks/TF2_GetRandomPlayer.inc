@@ -10,3 +10,9 @@ stock TF2GetRandomPlayer(team) {
      
     return clients[GetRandomInt(0, clientCount - 1)]; 
 }  
+
+/*TF2 Team List
+TFTeam_Red - Red
+TFTeam_Blue - Blue
+TFTeam_Spectator - Spectator
+*/
