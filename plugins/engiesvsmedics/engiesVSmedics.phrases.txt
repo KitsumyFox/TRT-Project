@@ -124,6 +124,6 @@
 	"chosenzombiecmd"
 	{
 		"#Format" "{1:s}"
-		"en"	"The unlucky human is {1}!"
+		"en"	"The unlucky human has been chosen"
 	}
 }

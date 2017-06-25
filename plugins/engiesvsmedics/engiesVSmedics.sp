@@ -19,8 +19,6 @@ Handle RedWonHandle = INVALID_HANDLE;
 Handle SuperZombiesTimerHandle = INVALID_HANDLE;
 int CountDownCounter = 0;
 bool SuperZombies = false;
-bool isOutLined[MAXPLAYERS+1];
-Handle OutlineEnabled;
 /* HOW THIS PLUGIN WORKS:
  *	Basically, it keeps track of wether a player has died or not during a game (in the DiedYet array)
  *	when a player is connected it has its DiedYet value set to -1 if the game has started, 1 else.
@@ -60,7 +58,6 @@ public void OnPluginStart (){
 	zve_super_zombies = CreateConVar("zve_super_zombies", "30.0", "How much time before round end zombies gain super abilities. Set to 0 to disable it.")
 	zve_tanks = CreateConVar("zve_tanks", "60.0", "How much time after setup the first zombies have a health boost. Set to 0 to disable it.")
 	AutoExecConfig(true, "plugin_zve");
-	RegAdminCmd("sm_outline", Zve_ToggleOutline, 0, "sm_outline - Toggles outline on players");
 	RegAdminCmd("sm_forcepickzombie", Zve_ForcePickZombie, ADMFLAG_GENERIC, "Forces to randomly pick a player from red and forces them to join blue.");
 	RegAdminCmd("sm_fpz", Zve_ForcePickZombie, ADMFLAG_GENERIC, "Forces to randomly pick a player from red and forces them to join blue.");
 	LoadTranslations("engiesVSmedics.phrases");
@@ -348,18 +345,13 @@ public Action Evt_PlayerDeath(Event event, const char[] name, bool dontBroadcast
 	}
 	if (count == 2)
 	{
-		TF2_AddCondition(client, view_as<TFCond>(31), TFCondDuration_Infinite, 0);
-		ServerCommand("sm_outline \"#%N\" 1", client);
+		TF2_AddCondition(client, view_as<TFCond>(19), TFCondDuration_Infinite, 0);
 	}
 	if (count == 1)
     {
         TF2_AddCondition(client, view_as<TFCond>(42), TFCondDuration_Infinite, 0);
         TF2_AddCondition(client, view_as<TFCond>(49), TFCondDuration_Infinite, 0);
     }
-	if (count == 0)
-    {
-    	ServerCommand("sm_outline @all 0");
-   	}
 }
 
 
@@ -378,10 +370,6 @@ public Action Evt_PlayerDisconnect(Event event, const char[] name, bool dontBroa
 
 }
 
-public OnClientPutInServer(client)
-{
-	isOutLined[client] = false;
-}
 
 //ROUND RELATED EVENTS
 
@@ -894,76 +882,48 @@ public int function_countPlayers(){
 }
 
 // COMMANDS
-public Action Zve_ToggleOutline(int client, int args)
-{
-	if(!GetConVarBool(OutlineEnabled))
-	{
-		return Plugin_Continue;
-	}
-	if(args == 0)
-	{
-		if(client == 0)
-		{
-			PrintToServer("Usage: sm_outline <#userid|name> <1/0>")
-			return Plugin_Handled;
-		}
-		else if (!isOutLined[client])
-		{
-			Outline(client, true);
-			return Plugin_Handled;
-		}
-		else if (isOutLined[client])
-		{
-			Outline(client, false);
-			return Plugin_Handled;
-		}
-	}
-	if(args == 1)
-	{
-		if(!CheckCommandAccess(client, "sm_outline_target", ADMFLAG_GENERIC))
-		{
-			CReplyToCommand(client, "[ZVE]: No Access");
-			return Plugin_Handled
-		}
-		ReplyToCommand(client, "Usage: sm_outline <#userid|name> <1/0>");
-		return Plugin_Handled
-	}
-	return Plugin_Handled
-}
-
 public Action Zve_ForcePickZombie(int client, int args)
 {
 	new chosenzombie = GetRandomPlayer(3);
 	
-	if (chosenzombie == -1)
+	if (chosenzombie == 2)
 	{
 		CPrintToChat(client, "\x05[EVZ]:\x01 %t", "forcepickzombiefail");
 		return Plugin_Handled;
 	}
 	
-	new String:name[32];
-	GetClientName(chosenzombie, name, sizeof(name));
-	CPrintToChatAll("\x05[EVZ]:\x01 %t", "pickrandomzombie1");
-	CPrintToChatAll("\x05[EVZ]:\x01 %t", "pickrandomzombie2");
-	CPrintToChatAll("\x05[EVZ]:\x01 %t", "pickrandomzombie3");
-	CPrintToChatAll("\x05[EVZ]:\x01 %t", "pickrandomzombie4");
-	CPrintToChatAll("\x05[EVZ]:\x01 %t", "chosenzombiecmd", chosenzombie, name)
+	CreateTimer(1.0, zombie1)
 	function_SafeTeamChange(chosenzombie, TFTeam_Blue);
 	return Plugin_Handled
 }
 
-stock Outline(client, bool add = true)
+public Action zombie1(Handle timer)
 {
-	if(add)
-	{
-		SetEntProp(client, Prop_Send, "m_bGlowEnabled", 1);
-		isOutLined[client] = true;
-	}
-	else
-	{
-		SetEntProp(client, Prop_Send, "m_bGlowEnabled", 0);
-		isOutLined[client] = false;
-	}
+	CPrintToChatAll("\x05[EVZ]:\x01 %t", "pickrandomzombie1");
+	CreateTimer(1.0, zombie2)
+}
+
+public Action zombie2(Handle timer)
+{
+	CPrintToChatAll("\x05[EVZ]:\x01 %t", "pickrandomzombie2");
+	CreateTimer(1.0, zombie3)
+}
+
+public Action zombie3(Handle timer)
+{
+	CPrintToChatAll("\x05[EVZ]:\x01 %t", "pickrandomzombie3");
+	CreateTimer(1.0, zombie4)
+}
+
+public Action zombie4(Handle timer)
+{
+	CPrintToChatAll("\x05[EVZ]:\x01 %t", "pickrandomzombie4");
+	CreateTimer(1.0, zombie5)
+}
+
+public Action zombie5(Handle timer)
+{
+	CPrintToChatAll("\x05[EVZ]:\x01 %t", "chosenzombiecmd")
 }
 
 stock IsValidClient(client, bool replaycheck = true)
