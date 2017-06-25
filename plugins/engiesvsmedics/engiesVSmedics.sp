@@ -941,11 +941,13 @@ public Action Zve_ForcePickZombie(int client, int args)
 		return Plugin_Handled;
 	}
 	
+	new String:name[32];
+	GetClientName(client, name, sizeof(name));
 	CPrintToChatAll("\x05[EVZ]:\x01 %t", "pickrandomzombie1");
 	CPrintToChatAll("\x05[EVZ]:\x01 %t", "pickrandomzombie2");
 	CPrintToChatAll("\x05[EVZ]:\x01 %t", "pickrandomzombie3");
 	CPrintToChatAll("\x05[EVZ]:\x01 %t", "pickrandomzombie4");
-	CPrintToChatAll("\x05[EVZ]:\x01 %t", "chosenzombiecmd", chosenzombie)
+	CPrintToChatAll("\x05[EVZ]:\x01 %t", "chosenzombiecmd", chosenzombie, name)
 	function_SafeTeamChange(chosenzombie, TFTeam_Blue);
 	return Plugin_Handled
 }
