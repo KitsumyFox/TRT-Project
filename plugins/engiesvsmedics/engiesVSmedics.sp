@@ -942,7 +942,7 @@ public Action Zve_ForcePickZombie(int client, int args)
 	}
 	
 	new String:name[32];
-	GetClientName(client, name, sizeof(name));
+	GetClientName(chosenzombie, name, sizeof(name));
 	CPrintToChatAll("\x05[EVZ]:\x01 %t", "pickrandomzombie1");
 	CPrintToChatAll("\x05[EVZ]:\x01 %t", "pickrandomzombie2");
 	CPrintToChatAll("\x05[EVZ]:\x01 %t", "pickrandomzombie3");
