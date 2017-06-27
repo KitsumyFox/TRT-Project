@@ -5,6 +5,21 @@
 #include <clients>
 #include <morecolors>
 
+// Doublejump add-on starts
+ConVar g_cvJumpMax = null;
+ConVar g_cvAllorTeam = null;
+ConVar g_cvJumpBoost = null;
+ConVar g_cvJumpEnable = null;
+ConVar g_cvBlueorRed = null;
+float g_flBoost = 250.0;
+bool g_bDoubleJump;
+bool g_bAllorTeam;
+bool g_bBlueorRed;
+int g_iJumpMax;
+int g_iLastButtons[MAXPLAYERS+1];
+int g_iLastFlags[MAXPLAYERS+1];
+int g_iJumps[MAXPLAYERS+1];
+// Doublejump add-on ends
 
 int DiedYet[64]; //this array stores wether a player is in the game and wether a player is in blue or red team
 int GameStarted=0; //this int stores the amount of time the game has been started, resets when the game ends.
@@ -62,6 +77,25 @@ public void OnPluginStart (){
 	RegAdminCmd("sm_fpz", Zve_ForcePickZombie, ADMFLAG_GENERIC, "Forces to randomly pick a player from red and forces them to join blue.");
 	LoadTranslations("engiesVSmedics.phrases");
 	LoadTranslations("common.phrases");
+	
+	// Double Jump
+	g_cvJumpEnable = CreateConVar("sm_doublejump_enabled", "1", "Enables double jumping");
+	g_cvJumpBoost = CreateConVar("sm_doublejump_boost", "250.0", "Vertical boost count");
+	g_cvJumpMax = CreateConVar("sm_doublejump_max", "1", "Maximum numbers of double jumps");
+	g_cvAllorTeam = CreateConVar("sm_doublejump_allorteam", "1", "Specifies whether you want doublejump only enabled on one team or on all teams");
+	g_cvBlueorRed = CreateConVar("sm_doublejump_redorblue", "0", "Specifies which team to pick. Red = 1, Blue = 0");
+	
+	g_cvJumpEnable.AddChangeHook(convar_ChangeEnable);
+	g_cvJumpBoost.AddChangeHook(convar_ChangeBoost);
+	g_cvJumpMax.AddChangeHook(convar_ChangeMax);
+	g_cvAllorTeam.AddChangeHook(convar_AllorTeam);
+	g_cvBlueorRed.AddChangeHook(convar_BlueorRed);
+
+	g_bBlueorRed = g_cvBlueorRed.BoolValue;
+	g_bAllorTeam = g_cvAllorTeam.BoolValue;
+	g_bDoubleJump = g_cvJumpEnable.BoolValue;
+	g_flBoost = g_cvJumpBoost.FloatValue;
+	g_iJumpMax = g_cvJumpMax.IntValue;
 }
 /*
  * This method disables respawn times and prevents teams auto balance.
@@ -385,6 +419,7 @@ public Action Evt_WaitingBegins(Event event, const char[] name, bool dontBroadca
  */
 public Action Evt_RoundStart(Event event, const char[] name, bool dontBroadcast){
 	SuperZombies = false;
+	ServerCommand("sm_doublejump_boost 250");
 	ServerCommand("sv_gravity 800");
 	if(RedWonHandle!=INVALID_HANDLE) {
 		KillTimer(RedWonHandle,false);
@@ -446,6 +481,7 @@ public Action SuperZombiesTimer(Handle timer){
 	CPrintToChatAll("\x05[EVZ]:\x01 %t", "power_up");
 	SuperZombies = true;
 	ServerCommand("sv_gravity 400");
+	ServerCommand("sm_doublejump_boost 350")
 	for(int i=0; i<64; i++) {
 		if(DiedYet[i]==-1) {
 
@@ -890,40 +926,10 @@ public Action Zve_ForcePickZombie(int client, int args)
 	{
 		CPrintToChat(client, "\x05[EVZ]:\x01 %t", "forcepickzombiefail");
 		return Plugin_Handled;
-	}
-	
-	CreateTimer(1.0, zombie1)
+		}
+	CPrintToChatAll("\x05[ZVE]:\x01 %t", chosenzombie);
 	function_SafeTeamChange(chosenzombie, TFTeam_Blue);
 	return Plugin_Handled
-}
-
-public Action zombie1(Handle timer)
-{
-	CPrintToChatAll("\x05[EVZ]:\x01 %t", "pickrandomzombie1");
-	CreateTimer(1.0, zombie2)
-}
-
-public Action zombie2(Handle timer)
-{
-	CPrintToChatAll("\x05[EVZ]:\x01 %t", "pickrandomzombie2");
-	CreateTimer(1.0, zombie3)
-}
-
-public Action zombie3(Handle timer)
-{
-	CPrintToChatAll("\x05[EVZ]:\x01 %t", "pickrandomzombie3");
-	CreateTimer(1.0, zombie4)
-}
-
-public Action zombie4(Handle timer)
-{
-	CPrintToChatAll("\x05[EVZ]:\x01 %t", "pickrandomzombie4");
-	CreateTimer(1.0, zombie5)
-}
-
-public Action zombie5(Handle timer)
-{
-	CPrintToChatAll("\x05[EVZ]:\x01 %t", "chosenzombiecmd")
 }
 
 stock IsValidClient(client, bool replaycheck = true)
@@ -961,3 +967,133 @@ stock GetRandomPlayer(team) {
 1 - Spectator
 0 - No Team
 */
+
+// Double jump add-on
+
+public int convar_ChangeBoost(Handle convar, const char[] oldVal, const char[] newVal)
+{
+	g_flBoost = StringToFloat(newVal);
+}
+
+public int convar_ChangeEnable(Handle convar, const char[] oldVal, const char[] newVal)
+{
+	if(StringToInt(newVal) >=1)
+	{
+		g_bDoubleJump = true;
+	}
+	else
+	{
+		g_bDoubleJump = false;
+	}
+}
+
+public void convar_ChangeMax(Handle convar, const char[] oldVal, const char[] newVal)
+{
+	g_iJumpMax = StringToInt(newVal);
+}
+
+public void convar_AllorTeam(Handle convar, const char[] oldVal, const char[] newVal)
+{
+	if(StringToInt(newVal) >=1)
+	{
+		g_bAllorTeam = true;
+	}
+	else
+	{
+		g_bDoubleJump = false;
+	}
+}
+
+public void convar_BlueorRed(Handle convar, const char[] oldVal, const char[] newVal)
+{
+	if(StringToInt(newVal) >=0)
+	{
+		g_bBlueorRed = true;
+	}
+	else
+	{
+		g_bBlueorRed = false;
+	}
+}
+
+public void OnGrameFrame()
+{
+	if(g_bDoubleJump)
+	{
+		for (int i = 1; i <= MaxClients; i++)
+		{
+			if(!g_bAllorTeam)
+			{
+				if(IsClientInGame(i) && IsPlayerAlive(i))
+				{
+					DoubleJump(i);
+				}
+			}
+			else if(g_bAllorTeam)
+			{
+				if(!g_bBlueorRed)
+				{
+					if(IsClientInGame(i) && IsPlayerAlive(i) && GetClientTeam(i) == 3)
+					{
+						DoubleJump(i);
+					}
+				}
+				else if(g_bBlueorRed)
+				{
+					if(IsClientInGame(i) && IsPlayerAlive(i) && GetClientTeam(i) == 2)
+					{
+						DoubleJump(i);
+					}
+				}
+			}
+		}		
+	}
+}
+
+stock void DoubleJump(int client)
+{
+	int fCurFlags = GetEntityFlags(client);
+	int fCurButtons = GetEntityFlags(client);
+	
+	if(g_iLastFlags[client] & FL_ONGROUND)
+	{
+		if(!(fCurFlags & FL_ONGROUND) && !(g_iLastButtons[client] & IN_JUMP) && (fCurButtons & IN_JUMP))
+		{
+			OriginalJump(client);
+		}
+	}
+	else if(fCurFlags & FL_ONGROUND)
+	{
+		LandedClient(client);
+	}
+	else if(!(g_iLastButtons[client] & IN_JUMP) && (fCurButtons & IN_JUMP))
+	{
+		ReJump(client);
+	}
+	
+	g_iLastFlags[client] = fCurFlags;
+	g_iLastButtons[client] = fCurButtons;
+}
+
+stock void OriginalJump(int client) 
+{
+	g_iJumps[client]++;
+}
+
+stock void LandedClient(int client) 
+{
+	g_iJumps[client] = 0;
+}
+
+stock void ReJump(int client) 
+{
+	if ( 1 <= g_iJumps[client] <= g_iJumpMax) 
+	{						
+		g_iJumps[client]++;
+		float vVel[3];
+		GetEntPropVector(client, Prop_Data, "m_vecVelocity", vVel);
+		
+		vVel[2] = g_flBoost;
+		TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, vVel);
+	}
+}
