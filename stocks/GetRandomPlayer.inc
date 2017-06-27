@@ -8,8 +8,8 @@ GetRandomPlayer(team)
 }
 
 /*Team List
-3 - Red / T
-2 - Blue / CT
+3 - Blue / CT
+2 - Red / T
 1 - Spectator
 0 - No Team
 */
