@@ -99,31 +99,37 @@
 	"forcepickzombiefail"
 	{
 		"en"	"There are not enough players to force choose a random zombie!"
+		"es"	"No suficientes jugadores como para forzar un zombie aleatorio!"
 	}
 	
 	"pickrandomzombie1"
 	{
 		"en"	"Choosing random zombie in 4 seconds..."
+		"es"	"Eligiendo a un zombie aleatorio en 4 segundos..."
 	}
 	
 	"pickrandomzombie2"
 	{
 		"en"	"Choosing random zombie in 3 seconds..."
+		"es"	"Eligiendo a un zombie aleatorio en 3 segundos..."
 	}
 	
 	"pickrandomzombie3"
 	{
 		"en"	"Choosing random zombie in 2 seconds..."
+		"es"	"Eligiendo a un zombie aleatorio en 2 segundos..."
 	}
 	
 	"pickrandomzombie4"
 	{
 		"en"	"Choosing random zombie in 1 second..."
+		"es"	"Eligiendo a un zombie aleatorio en 1 segundos..."
 	}
 	
 	"chosenzombiecmd"
 	{
 		"#Format" "{1:s}"
 		"en"	"The unlucky human has been chosen"
+		"es"	"El humano desafortunado fue elegido"
 	}
 }
