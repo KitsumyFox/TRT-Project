@@ -1,7 +1,7 @@
 # Engineers vs Medics
 * [Original Project Link](https://forums.alliedmods.net/showthread.php?p=2513026)
 
-#CVAR/s
+# CVAR/s
 zve_setup_time - time controls the time during which engineers can safely setup 30 seconds by default.
 zve_round_time - Round time, 5 minutes by default.
 zve_super_zombies - How much time before round end zombies gain super abilities.30 seconds by default. Set to 0 to disable it.
