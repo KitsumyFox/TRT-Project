@@ -99,7 +99,7 @@
 	"forcepickzombiefail"
 	{
 		"en"	"There are not enough players to force choose a random zombie!"
-		"es"	"No suficientes jugadores como para forzar un zombie aleatorio!"
+		"es"	"No hay suficientes jugadores como para forzar un zombie aleatorio!"
 	}
 	
 	"pickrandomzombie1"
